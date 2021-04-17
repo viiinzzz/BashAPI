@@ -1,0 +1,132 @@
+#
+# Build and Run guidance
+#--------------------------------------------------------------------------------------------------
+# docker build . --tag="lyapi:debug"   --build-arg CONFIG="debug"   --build-arg NETENV="Development"   
+#                --tag="lyapi:release" --build-arg CONFIG="release" --build-arg NETENV="Production"
+#				 --build-arg rootPassword=... --build-arg sslPassword=...
+#
+# docker run -it -p7580:8080 -p7581:8081 -e ASPNETCORE_HTTPS_PORT=7581 lyapi:debug bash
+#
+# docker ps -a -q --filter ancestor=lyapi:debug --format="{{.ID}}"
+#
+# docker system prune
+
+#
+# global arguments
+#--------------------------------------------------------------------------------------------------
+#ARG LYBASE=stable # it's got the main lilypond however...
+ARG LYBASE=devel   # it's got the convert-ly in addition
+# and the damn huge python on top of it, but can't really work seriously on .ly without it
+
+ARG rootPassword=password # secrets passed via --build-arg switch
+ARG sslPassword=password  #
+ARG CONFIG="debug"        # Debug/Release
+ARG NETENV="Development"  # Development/Production
+
+#base = debian + lily AND my additions: curl + .Net + dev tools eventually
+FROM jeandeaual/lilypond:$LYBASE AS lyapi-base
+ARG LYBASE
+ARG rootPassword
+ARG sslPassword
+ARG CONFIG
+ARG NETENV
+
+RUN echo 'root:$(rootPassword)' | chpasswd
+RUN apt update && apt -y upgrade
+
+#optional tools for development and tbshoot
+#process: ps -a, kill
+#text editor: nano
+#text based browsers: w3m (q for quit)
+ENV WWW_HOME="https://localhost:8081/health"
+RUN if [[ "$CONFIG" == "debug" ]] ; then apt -y install procps nano w3m ; fi
+
+
+RUN apt -y install curl
+WORKDIR /app
+RUN curl -L http://dot.net/v1/dotnet-install.sh -o dotnet-install.sh
+RUN chmod 744 dotnet-install.sh
+RUN ./dotnet-install.sh --verbose --install-dir /usr/share/dotnet --runtime aspnetcore
+#--runtime aspnetcore    without it : full SDK : needed for     dotnet dev-certs https
+RUN rm dotnet-install.sh
+ENV PATH="$PATH:/usr/share/dotnet"
+#RUN curl -sSL https://aka.ms/getvsdbgsh | bash /dev/stdin -v vs2019 -l ~/vsdbg
+
+#cert matters
+FROM lyapi-base AS lyapi-cert
+
+#certv1
+#RUN dotnet dev-certs https
+
+#certv3
+RUN ( \
+  echo '[req]'; \
+  echo 'default_bits= 4096'; \
+  echo 'distinguished_name=req'; \
+  echo 'x509_extension = v3_ca'; \
+  echo 'req_extensions = v3_req'; \
+  echo '[v3_req]'; \
+  echo 'basicConstraints = CA:FALSE'; \
+  echo 'keyUsage = nonRepudiation, digitalSignature, keyEncipherment'; \
+  echo 'subjectAltName = @alt_names'; \
+  echo '[ alt_names ]'; \
+  echo 'DNS.1 = localhost'; \
+  echo '[ v3_ca ]'; \
+  echo 'subjectKeyIdentifier=hash'; \
+  echo 'authorityKeyIdentifier=keyid:always,issuer'; \
+  echo 'basicConstraints = critical, CA:TRUE, pathlen:0'; \
+  echo 'keyUsage = critical, cRLSign, keyCertSign'; \
+  echo 'extendedKeyUsage = serverAuth, clientAuth' \
+)>LocalCA.config
+
+RUN openssl req -x509 -newkey rsa:4096 -sha256 -days 365 -nodes -extensions v3_ca -extensions v3_req \
+-keyout LocalCA.key -out LocalCA.crt -subj "/CN=localhost"  -config LocalCA.config \
+&& openssl x509 -noout -text -in LocalCA.crt \
+&& openssl verify -CAfile LocalCA.crt LocalCA.crt \
+&& cp LocalCA.crt /usr/local/share/ca-certificates \
+&& update-ca-certificates \
+&& openssl verify LocalCA.crt \
+&& openssl pkcs12 -export -out LocalCA.pfx -inkey LocalCA.key -in LocalCA.crt -passout pass:$(sslPassword) 
+
+RUN if [[ "$CONFIG" == "debug" ]] ; then \
+	ls LocalCA*.* \
+; fi
+
+
+#our WebApp
+FROM lyapi-cert AS lyapi
+MAINTAINER Viiinzzz <vincentfontaine.jobs@gmail.com>
+
+COPY . .
+#COPY ["src/proj.csproj", "src/"]
+ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
+ENV DOTNET_CLI_TELEMETRY_OPTOUT=1
+ENV ASPNETCORE_ENVIRONMENT=$NETENV
+ENV ASPNETCORE_URLS=http://+:8080;https://+:8081
+ENV ASPNETCORE_Kestrel__Certificates__Default__Path=/app/LocalCA.pfx
+ENV ASPNETCORE_Kestrel__Certificates__Default__Password=$sslPassword
+#ENV UseInMemoryDatabase=false
+#ARG ConnectionStrings__DefaultConnection=
+
+
+#RUN adduser --user-group --system --create-home --no-log-init --disabled-password --gecos '' apprunner
+#RUN adduser --system --disabled-password --gecos '' apprunner
+#RUN useradd -ms /bin/bash apprunner
+#RUN usermod -aG sudo apprunner
+#USER apprunner
+
+#RUN echo LYBASE=$LYBASE rootPassword=$rootPassword sslPassword=$sslPassword CONFIG=$CONFIG NETENV=$NETENV>args.txt
+
+#few tests
+RUN ls /etc/ssl/certs/LocalCA.pem
+RUN awk -v cmd='openssl x509 -noout -subject' '/BEGIN/{close(cmd)};{print | cmd}' < /etc/ssl/certs/ca-certificates.crt | grep localhost
+#RUN dotnet BashAPI.dll &
+#RUN openssl s_client -quiet -connect localhost:8081
+#RUN curl https://localhost:8081/health
+#RUN w3m -T text/plain -dump
+
+RUN chmod 744 api-run.sh
+EXPOSE 8080 8081
+ENTRYPOINT dotnet BashAPI.dll
+
+

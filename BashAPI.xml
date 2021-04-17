@@ -1,0 +1,204 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>BashAPI</name>
+    </assembly>
+    <members>
+        <member name="T:BashAPI.Program">
+            <summary>
+            The WebAPI program
+            </summary>
+        </member>
+        <member name="M:BashAPI.Program.Main(System.String[])">
+            <summary>
+            The WebAPI entry point
+            </summary>
+            <param name="args"></param>
+        </member>
+        <member name="M:BashAPI.Program.CreateHostBuilder(System.String[])">
+            <summary>
+            The WebAPI host builder
+            </summary>
+            <param name="args"></param>
+            <returns></returns>
+        </member>
+        <member name="T:BashAPI.ShowableException">
+            <summary>
+            An exception whose message can be safely shown to external party
+            </summary>
+        </member>
+        <member name="M:BashAPI.ShowableException.#ctor(System.String)">
+            <summary>
+            constructor with a message string
+            </summary>
+            <param name="message">string</param>
+        </member>
+        <member name="T:BashAPI.Startup">
+            <summary>
+            The WebAPI Startup class
+            </summary>
+            <summary>
+            The WebAPI Startup class
+            </summary>
+        </member>
+        <member name="M:BashAPI.Startup.Configure(Microsoft.AspNetCore.Builder.IApplicationBuilder,Microsoft.AspNetCore.Hosting.IWebHostEnvironment)">
+            <summary>
+            method to configure the app
+            </summary>
+        </member>
+        <member name="P:BashAPI.Startup.Configuration">
+            <summary>
+            the app settings
+            </summary>
+        </member>
+        <member name="M:BashAPI.Startup.#ctor(Microsoft.AspNetCore.Hosting.IWebHostEnvironment,Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            method to startup the app
+            </summary>
+        </member>
+        <member name="M:BashAPI.Startup.ConfigureServices(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            method to configure the services
+            </summary>
+        </member>
+        <member name="T:BashAPI.Controllers.BashController">
+            <summary>
+            This controller has only one POST method to bridge bash command
+            </summary>
+        </member>
+        <member name="P:BashAPI.Controllers.BashController.FILENAME_MAX_LEN">
+            <summary>
+            input file name maximum length (characters)
+            </summary>
+        </member>
+        <member name="P:BashAPI.Controllers.BashController.OUTPUT_MAX_LEN">
+            <summary>
+            returned file name maximum length (characters)
+            </summary>
+        </member>
+        <member name="P:BashAPI.Controllers.BashController.SIZE_MAX_INPUT">
+            <summary>
+            input file maximum size (in bytes)
+            </summary>
+        </member>
+        <member name="P:BashAPI.Controllers.BashController.SIZE_MAX_OUTPUT">
+            <summary>
+            returned file maximim size (in bytes)
+            </summary>
+        </member>
+        <member name="M:BashAPI.Controllers.BashController.#ctor(Microsoft.Extensions.Logging.ILogger{BashAPI.Controllers.BashController},Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            Linux Bash Controller
+            </summary>
+            <param name="logger">logger</param>
+            <param name="config">configuration</param>
+        </member>
+        <member name="M:BashAPI.Controllers.BashController.Execute(System.Threading.CancellationToken,Microsoft.AspNetCore.Http.IFormFile,System.String,System.String,System.Int32,System.String)">
+             <summary>
+             Execute command via bash with arguments
+             </summary>
+             <param name="cancel">cancellation token</param>
+             <param name="file">input file or zip file</param>
+             <param name="command">command and arguments (must include "input" and "output")</param>
+             <param name="outputname">output file name</param>
+             <param name="timeoutseconds">seconds before processing gets interrupted (-1 for default value 180)</param>
+             <param name="inputname">(optional)zip file entryname to use as input file</param>
+             <returns>output file</returns>
+             <response code="200">file processing succeeded.</response>
+             <response code="400">file processing failed.</response>
+            <remarks>
+              <h2>Example</h2>
+                 <ul>
+                 <li>file: test.txt</li>
+                 <li>command: gzip -c "input" > "output"</li>
+                 <li>outputname: test.gz</li>
+                 <li>timeoutseconds: 180</li>
+                 </ul>
+             </remarks>
+        </member>
+        <member name="M:BashAPI.Controllers.BashController.envir(System.Threading.CancellationToken)">
+            <summary>
+            Return Environment string Develoment / Staging / Production
+            </summary>
+            <param name="cancel"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Xtensions.Std.Copyright">
+            <summary>
+            static class to display author's logo in console.
+            </summary>
+        </member>
+        <member name="F:Xtensions.Std.Copyright.company">
+            <summary>
+            Company name
+            </summary>
+        </member>
+        <member name="F:Xtensions.Std.Copyright.C_company">
+            <summary>
+            copyright prepended company name
+            </summary>
+        </member>
+        <member name="F:Xtensions.Std.Copyright.pkgdesc">
+            <summary>
+            license issue date
+            </summary>
+        </member>
+        <member name="F:Xtensions.Std.Copyright.term_date">
+            <summary>
+            license issue date
+            </summary>
+        </member>
+        <member name="F:Xtensions.Std.Copyright.major">
+            <summary>
+            package major
+            </summary>
+        </member>
+        <member name="F:Xtensions.Std.Copyright.major_minor">
+            <summary>
+            package major.minor
+            </summary>
+        </member>
+        <member name="F:Xtensions.Std.Copyright.splash">
+            <summary>
+            splash text with assembly name version and company copyright
+            </summary>
+        </member>
+        <member name="M:Xtensions.Std.Copyright.ToAsciiArt(System.String)">
+            <summary>
+            convert string to ASCII Art
+            </summary>
+            <param name="x">string</param>
+            <returns></returns>
+        </member>
+        <member name="T:Xtensions.Core.Swagger.SwaggerConfigure">
+            <summary>
+            swagger helpers to be invoked in the configure method of the app
+            </summary>
+        </member>
+        <member name="M:Xtensions.Core.Swagger.SwaggerConfigure.UseMySwagger(Microsoft.AspNetCore.Builder.IApplicationBuilder,System.String,System.Int32)">
+            <summary>
+            custom UseSwagger
+            </summary>
+        </member>
+        <member name="T:Xtensions.Core.Swagger.SwaggerConfigureServices">
+            <summary>
+            swagger helpers to be invoked in the configure services method of the app
+            </summary>
+        </member>
+        <member name="M:Xtensions.Core.Swagger.SwaggerConfigureServices.AddMySwaggerGen(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Reflection.Assembly,System.String,System.Int32,System.String,System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            custom AssSwaggerGen
+            </summary>
+            <param name="services"></param>
+            <param name="ass"></param>
+            <param name="apititle"></param>
+            <param name="apiversion"></param>
+            <param name="apidesc"></param>
+            <param name="author"></param>
+            <param name="email"></param>
+            <param name="website"></param>
+            <param name="license"></param>
+            <param name="lictype"></param>
+        </member>
+    </members>
+</doc>

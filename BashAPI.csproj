@@ -5,29 +5,118 @@
     <UserSecretsId>b597ac71-5ef9-4146-8715-66bd866affd1</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerfileContext>.</DockerfileContext>
+    <Company>Viiinzzz data corp.</Company>
+    <Description>BashAPI, a .Net WebAPI wrapper for Bash</Description>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <RepositoryUrl>https://github.com/viiinzzz/BashAPI</RepositoryUrl>
+    <RepositoryType>Github</RepositoryType>
+    <PackageProjectUrl>https://github.com/viiinzzz/BashAPI/blob/master/README.md</PackageProjectUrl>
+    <Version>01-apr-2021</Version>
+    <Copyright>©2020-2021</Copyright>
+    <ApplicationIcon>bash.ico</ApplicationIcon>
+    <PackageIcon>bash.png</PackageIcon>
+    <Authors>vincentfontaine.jobs@gmail.com</Authors>
+    <AssemblyVersion>1.1.0.0</AssemblyVersion>
+    <FileVersion>1.1.0.0</FileVersion>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>obj\Debug\netcoreapp3.1\BashAPI.xml</DocumentationFile>
+    <DocumentationFile>BashAPI.xml</DocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>obj\Release\netcoreapp3.1\BashAPI.xml</DocumentationFile>
+    <DocumentationFile>BashAPI.xml</DocumentationFile>
+    <WarningLevel>4</WarningLevel>
+    <DefineConstants>TRACE</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="wwwroot.old\**" />
-    <Content Remove="wwwroot.old\**" />
-    <EmbeddedResource Remove="wwwroot.old\**" />
-    <None Remove="wwwroot.old\**" />
+    <Content Remove="wwwroot\conv.css" />
+    <Content Remove="wwwroot\conv.js" />
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="featured\wwwroot\bootstrap.bundle.min.js" />
+    <None Remove="featured\wwwroot\bootstrap.bundle.min.js.map" />
+    <None Remove="featured\wwwroot\default.html" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="featured\wwwroot\bootstrap.bundle.min.js">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="featured\wwwroot\bootstrap.bundle.min.js.map">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="featured\wwwroot\conv.html" />
+    <Content Include="featured\wwwroot\default.html">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="featured\wwwroot\failtenor.gif" />
+    <Content Include="featured\wwwroot\failtenor2.gif" />
+    <Content Include="featured\wwwroot\LICENSE-bootstrap.txt" />
+    <Content Include="featured\wwwroot\LICENSE-pdfjs.txt" />
+    <Content Include="featured\wwwroot\pdf.js" />
+    <Content Include="featured\wwwroot\pdf.js.map" />
+    <Content Include="featured\wwwroot\pdf.sandbox.js" />
+    <Content Include="featured\wwwroot\pdf.sandbox.js.map" />
+    <Content Include="featured\wwwroot\pdf.worker.js" />
+    <Content Include="featured\wwwroot\pdf.worker.js.map" />
+    <Content Include="featured\wwwroot\popper.min.js" />
+    <Content Include="featured\wwwroot\popper.min.js.map" />
+    <Content Include="featured\wwwroot\spin100.gif" />
+    <Content Include="featured\wwwroot\spinav.gif" />
+    <Content Include="featured\wwwroot\spingr.gif" />
+  </ItemGroup>
+
+
+
+  <ItemGroup>
+    <None Include="bash.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+    <None Include="LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+    <None Include="wwwroot\default.css" />
+    <None Include="wwwroot\jquery-3.4.1.min.js" />
+    <None Include="wwwroot\jquery-3.4.1.min.map" />
+    <None Include="wwwroot\LICENSE-jquery.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Edi.RouteDebugger" Version="1.3.2" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.9" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.1.1" />
     <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.1.1" />
     <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="7.0.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="featured\featured.json">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 
+  <ItemGroup>
+    <None Update="BashAPI.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="rem Dockerize...&#xD;&#xA;@echo off&#xD;&#xA;if not exist &quot;$(ProjectDir)\featured&quot; exit 0&#xD;&#xA;cd &quot;$(ProjectDir)\featured&quot;&#xD;&#xA;&#xD;&#xA;echo Reading featured image name...&#xD;&#xA;for /f &quot;tokens=*&quot; %25%25v in ('powershell Get-Content featured.json ^^^| ConvertFrom-Json ^^^| Select -expandproperty dockerImageName') do set dockerImageName=%25%25v&#xD;&#xA;echo image name: %25dockerImageName%25&#xD;&#xA;if &quot;%25dockerImageName%25&quot; == &quot;&quot; exit -1&#xD;&#xA;&#xD;&#xA;echo Reading featured ports...&#xD;&#xA;for /f &quot;tokens=*&quot; %25%25v in ('powershell Get-Content featured.json ^^^| ConvertFrom-Json ^^^| Select -expandproperty dockerPublishHttpPort') do set dockerPublishHttpPort=%25%25v&#xD;&#xA;for /f &quot;tokens=*&quot; %25%25v in ('powershell Get-Content featured.json ^^^| ConvertFrom-Json ^^^| Select -expandproperty dockerPublishSslPort') do set dockerPublishSslPort=%25%25v&#xD;&#xA;echo http: %25dockerPublishHttpPort%25 https: %25dockerPublishSslPort%25&#xD;&#xA;if &quot;%25dockerPublishHttpPort%25&quot; == &quot;&quot; exit -1&#xD;&#xA;if &quot;%25dockerPublishSslPort%25&quot; == &quot;&quot; exit -1&#xD;&#xA;&#xD;&#xA;echo Reading build secrets...&#xD;&#xA;cd &quot;$(ProjectDir)&quot;&#xD;&#xA;for /f &quot;tokens=*&quot; %25%25v in ('dotnet user-secrets list ^| find &quot;dockerRootPassword&quot;') do set %25%25v&#xD;&#xA;for /f &quot;tokens=*&quot; %25%25v in ('dotnet user-secrets list ^| find &quot;dockerSslPassword&quot;') do set %25%25v&#xD;&#xA;set buildsecrets=--build-arg rootPassword=%25dockerRootPassword :~1%25 --build-arg sslPassword=%25dockerSslPassword :~1%25&#xD;&#xA;rem echo build secrets: %25buildsecrets%25&#xD;&#xA;if &quot;%25dockerRootPassword :~1%25&quot; == &quot;&quot; exit -1&#xD;&#xA;if &quot;%25dockerSslPassword :~1%25&quot; == &quot;&quot; exit -1&#xD;&#xA;&#xD;&#xA;cd &quot;$(ProjectDir)bin\Docker&quot;&#xD;&#xA;echo Copying build...&#xD;&#xA;xcopy /Q /Y /I /E &quot;$(TargetDir)*.*&quot; .&#xD;&#xA;echo Copying wwwroot...&#xD;&#xA;xcopy /Q /Y /I /E &quot;$(ProjectDir)wwwroot&quot; .\wwwroot&#xD;&#xA;echo Copying featured...&#xD;&#xA;xcopy /Q /Y /I /E &quot;$(ProjectDir)\featured\*.*&quot; .&#xD;&#xA;&#xD;&#xA;echo Building image...&#xD;&#xA;set DOCKER_BUILDKIT=true&#xD;&#xA;if &quot;$(ConfigurationName)&quot; == &quot;Debug&quot; (&#xD;&#xA;  set buildoptions=--tag=%25dockerImageName%25:debug --build-arg imageName=%25dockerImageName%25 --build-arg CONFIG=debug --build-arg NETENV=Development&#xD;&#xA;  set CONFIG=debug&#xD;&#xA;) else (&#xD;&#xA;  set buildoptions=--tag=%25dockerImageName%25:release --build-arg imageName=%25dockerImageName%25 --build-arg CONFIG=release --build-arg NETENV=Production&#xD;&#xA;  set CONFIG=release&#xD;&#xA;)&#xD;&#xA;&#xD;&#xA;echo Removing old running builds of %25dockerImageName%25:%25CONFIG%25...&#xD;&#xA;for /f &quot;tokens=*&quot; %25%25v in ('docker ps -a -q --filter ancestor^=%25dockerImageName%25:%25CONFIG%25 --format^=&quot;{{.ID}}&quot;') do (&#xD;&#xA;  echo Stopping %25%25v...&#xD;&#xA;  docker stop %25%25v&#xD;&#xA;)&#xD;&#xA;rem docker ps -a --filter ancestor=%25dockerImageName%25:%25CONFIG%25&#xD;&#xA;echo Removing running builds  on ports %25dockerPublishHttpPort%25,%25dockerPublishSslPort%25...&#xD;&#xA;for /f &quot;tokens=*&quot; %25%25v in ('docker container ls -a --filter publish^=%25dockerPublishHttpPort%25 --format &quot;{{.ID}}&quot;') do (&#xD;&#xA;  echo Stopping %25%25v...&#xD;&#xA;  docker stop %25%25v&#xD;&#xA;)&#xD;&#xA;for /f &quot;tokens=*&quot; %25%25v in ('docker container ls -a --filter publish^=%25dockerPublishSslPort%25 --format &quot;{{.ID}}&quot;') do (&#xD;&#xA;  echo Stopping %25%25v...&#xD;&#xA;  docker stop %25%25v&#xD;&#xA;)&#xD;&#xA;rem docker container ls -a --filter publish=%25PORTS%25 --format &quot;{{.ID}}&quot;&#xD;&#xA;echo Pruning containers...&#xD;&#xA;docker system prune --force&#xD;&#xA;&#xD;&#xA;echo Building new version of %25dockerImageName%25:%25CONFIG%25...&#xD;&#xA;rem echo docker build . %25buildoptions%25 %25buildsecrets%25&#xD;&#xA;docker build . %25buildoptions%25 %25buildsecrets%25&#xD;&#xA;docker images %25dockerImageName%25:%25CONFIG%25 --format=&quot;{{.ID}}&quot;&#xD;&#xA;&#xD;&#xA;rem launch container&#xD;&#xA;echo Running new build of %25dockerImageName%25:%25CONFIG%25...&#xD;&#xA;docker run -d -p%25dockerPublishHttpPort%25:8080 -p%25dockerPublishSslPort%25:8081 -e ASPNETCORE_HTTPS_PORT=%25dockerPublishSslPort%25 --rm %25dockerImageName%25:%25CONFIG%25" />
+  </Target>
+
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="if exist &quot;$(ProjectDir)bin\Docker&quot; rmdir /S /Q &quot;$(ProjectDir)bin\Docker&quot;&#xD;&#xA;if not exist &quot;$(ProjectDir)\featured&quot; exit 0&#xD;&#xA;mkdir &quot;$(ProjectDir)bin\Docker&quot;" />
+  </Target>
+
+  
 </Project>

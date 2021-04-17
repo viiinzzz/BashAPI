@@ -1,0 +1,90 @@
+
+#docker run -it -p7580:8080 -p7581:8081     lilypond-webapi bash
+
+
+#base debian lily curl and .Net
+FROM jeandeaual/lilypond:devel AS lydevbase
+MAINTAINER Viiinzzz <vincentfontaine.jobs@gmail.com>
+RUN echo 'root:dockerpassword' | chpasswd
+RUN apt update && apt -y upgrade
+RUN apt -y install nano
+RUN apt -y install curl
+WORKDIR /app
+RUN curl -L http://dot.net/v1/dotnet-install.sh -o dotnet-install.sh
+#https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-install-script
+RUN chmod 744 dotnet-install.sh
+RUN ./dotnet-install.sh --verbose --install-dir /usr/share/dotnet --runtime aspnetcore
+#--runtime aspnetcore
+#  without it : full SDK - needed for : dotnet dev-certs https
+RUN rm dotnet-install.sh
+ENV PATH="$PATH:/usr/share/dotnet"
+
+
+#cert matters
+#RUN dotnet dev-certs https
+FROM lydevbase AS lydevcert
+ARG SSLPW=sslpassword
+ENV CA="Viiinzzz.corp"
+RUN openssl req \
+-x509 \
+-newkey rsa:4096 \
+-sha256 \
+-days 365 \
+-nodes \
+-keyout $CA.key \
+-out $CA.crt \
+-subj "/CN=${CA}" \
+-extensions v3_ca \
+-extensions v3_req \
+-config <( \
+  echo '[req]'; \
+  echo 'default_bits= 4096'; \
+  echo 'distinguished_name=req'; \
+  echo 'x509_extension = v3_ca'; \
+  echo 'req_extensions = v3_req'; \
+  echo '[v3_req]'; \
+  echo 'basicConstraints = CA:FALSE'; \
+  echo 'keyUsage = nonRepudiation, digitalSignature, keyEncipherment'; \
+  echo 'subjectAltName = @alt_names'; \
+  echo '[ alt_names ]'; \
+  echo "DNS.1 = www.${CA}"; \
+  echo "DNS.2 = ${CA}"; \
+  echo '[ v3_ca ]'; \
+  echo 'subjectKeyIdentifier=hash'; \
+  echo 'authorityKeyIdentifier=keyid:always,issuer'; \
+  echo 'basicConstraints = critical, CA:TRUE, pathlen:0'; \
+  echo 'keyUsage = critical, cRLSign, keyCertSign'; \
+  echo 'extendedKeyUsage = serverAuth, clientAuth')
+RUN openssl x509 -noout -text -in $CA.crt
+RUN openssl verify -CAfile $CA.crt $CA.crt
+RUN cp $CA.crt /usr/local/share/ca-certificates
+RUN update-ca-certificates
+#ls /etc/ssl/certs/$CA.pem
+RUN awk -v cmd='openssl x509 -noout -subject' '/BEGIN/{close(cmd)};{print | cmd}' < /etc/ssl/certs/ca-certificates.crt | grep $CA
+RUN openssl verify $CA.crt
+RUN openssl pkcs12 -export -out $CA.pfx -inkey $CA.key -in $CA.crt -passout env:SSLPW
+#base64 Viiinzzz.corp.pfx
+
+#our WebApp
+FROM lydevcert AS lydevapi
+COPY . .
+#COPY ["src/proj.csproj", "src/"]
+ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
+ENV DOTNET_CLI_TELEMETRY_OPTOUT=1
+#ENV UseInMemoryDatabase=false
+#ARG ConnectionStrings__DefaultConnection=
+#ENV ASPNETCORE_ENVIRONMENT=Production
+ENV ASPNETCORE_ENVIRONMENT=Development
+#ENV ASPNETCORE_URLS=https://+;http://+
+ENV ASPNETCORE_URLS=http://+:8080;https://+:8081
+ENV ASPNETCORE_HTTPS_PORT=8081
+ENV ASPNETCORE_Kestrel__Certificates__Default__Path=/app/$CA.pfx
+ARG ASPNETCORE_Kestrel__Certificates__Default__Password=sslpassword
+EXPOSE 8080 8081
+
+#RUN adduser --user-group --system --create-home --no-log-init --disabled-password --gecos '' app
+#RUN adduser --system --disabled-password --gecos '' worker
+#RUN usermod -aG sudo worker
+#USER worker
+
+ENTRYPOINT dotnet BashAPI.dll --urls="https://0.0.0.0:8081"

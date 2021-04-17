@@ -1,0 +1,46 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" http-equiv="refresh" />
+    <title>Ly.API</title>
+    <link rel="stylesheet" href="bootstrap.min.css">
+    <link rel="stylesheet" href="default.css" />
+    <script src="jquery-3.4.1.min.js"></script>
+    <script src="bootstrap.min.js"></script>
+    <script>
+        jQuery(document).ready(function () {
+            $("#api").html('<object style="height:100%;width:100%" data="/swagger/ui/index2.html">')
+
+            $.ajax({
+                url: `${window.location.protocol}//${window.location.host}/envir`,
+                contentType: "text/plain",
+                //dataType: 'json',
+                success: function (envir) {
+                    $("#envir").css("display", envir == "Production" ? "none" : "block");
+                    $("#envir").text(envir);
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <div id="outer">
+        <div id="top" class="m-4">
+            <h1>LyAPI<span id="envir" class="anibg" style="font-size:1rem"></span></h1>
+            
+            <span>File Conversion <a href="/conv.html">.ly ➞ .pdf</a></span>
+
+            <p>A Web API for the music engraving program, LilyPond.</p>
+            <ul class="lic">
+                <li><a href="#">LyAPI by Vincent Fontaine</a></li>
+                <li><a href="http://github.com/viiinzzz/BashAPI/blob/master/README.md">BashAPI by Vincent Fontaine</a></li>
+                <li><a href="https://hub.docker.com/r/jeandeaual/lilypond">lilypond dockerized by Alexis Jeandeau</a></li>
+                <li><a href="http://lilypond.org/">lilypond.org</a></li>
+            </ul>
+            <img style="height:100px" src="lilypond.png" alt="logo" />
+        </div>
+        <div id="api"></div>
+    </div>
+    
+</body>
+</html>

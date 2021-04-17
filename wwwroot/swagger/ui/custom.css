@@ -1,0 +1,13 @@
+﻿.swagger-ui .topbar {
+    background-color: #000;
+    border-bottom: 3px solid #547f00;
+}
+
+.swagger-ui .scheme-container, .swagger-ui .topbar, a[href="/swagger/v1/swagger.json"] {
+    display: none !important;
+}
+
+.info {
+    margin-top: 0;
+    border-top: 0;
+}

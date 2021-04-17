@@ -1,0 +1,85 @@
+﻿
+.lic {
+    font-size: xx-small;
+}
+
+#outer {
+    display: flex;
+    flex-flow: column;
+    height: 100vh;
+}
+
+#top {
+    height: fit-content;
+}
+
+#pdf {
+    flex-grow: 1;
+    border: 1px solid black;
+    direction: ltr;
+}
+
+
+.hflip {
+    -moz-transform: scale(1, -1);
+    -webkit-transform: scale(1, -1);
+    -o-transform: scale(1, -1);
+    -ms-transform: scale(1, -1);
+    transform: scale(1, -1);
+}
+
+.vflip {
+    -moz-transform: scale(-1, 1);
+    -webkit-transform: scale(-1, 1);
+    -o-transform: scale(-1, 1);
+    -ms-transform: scale(-1, 1);
+    transform: scale(-1, 1);
+}
+
+.custom-file-input ~ .custom-file-label::after {
+    content: "📁";
+}
+
+
+#spin {
+    display: none;
+    width: 100vw;
+}
+
+#failed {
+    display: none;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#toolbar {
+    display: none
+}
+
+#doc {
+    position: relative;
+}
+
+#pdf-layer {
+    display: none;
+    margin-left: auto;
+    margin-right: auto;
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+#text-layer {
+    color: transparent;
+    z-index: 9;
+}
+
+#text-layer > div {
+    position: relative;
+    white-space: pre;
+    cursor: text;
+    transform-origin: 0% 0%;
+}
+

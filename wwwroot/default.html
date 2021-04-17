@@ -3,9 +3,26 @@
 <head>
     <meta charset="utf-8" http-equiv="refresh" content="0; url = /swagger/ui/index.html" />
     <title>BashAPI</title>
+    <link rel="stylesheet" href="default.css" />
+    <script src="jquery-3.4.1.min.js"></script>
+    <script>
+        jQuery(document).ready(function () {
+            $("#api").html('<object style="height:100%;width:100%" data="/swagger/ui/index2.html">')
+
+            $.ajax({
+                url: `${window.location.protocol}//${window.location.host}/envir`,
+                contentType: "text/plain",
+                //dataType: 'json',
+                success: function (envir) {
+                    $("#envir").css("display", envir == "Production" ? "none" : "block");
+                    $("#envir").text(envir);
+                }
+            });
+        });
+    </script>
 </head>
 <body>
-    <a href="/swagger/ui/index.html"><h1>BashAPI</h1></a>
-    Explore <b>/swagger/v1/swagger.json</b>
+    <a href="/swagger/ui/index.html"><h1>BashAPI<span id="envir" class="anibg" style="font-size:1rem"></span></h1></a>
+    
 </body>
 </html>

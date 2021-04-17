@@ -1,8 +1,0 @@
-﻿.swagger-ui .topbar {
-    background-color: #000;
-    border-bottom: 3px solid #547f00;
-}
-
-.swagger-ui .scheme-container, .swagger-ui .topbar {
-    display: none !important;
-}

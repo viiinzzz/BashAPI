@@ -1,0 +1,49 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft": "Warning",
+      "Microsoft.Hosting.Lifetime": "Information"
+    },
+    "Console": { // Console provider.
+      "LogLevel": {
+        "Default": "Information", // Overrides preceding LogLevel:Default setting.
+        "Microsoft.Hosting": "Debug" // Debug:Microsoft.Hosting category.
+      }
+    },
+    "Debug": { // Debug provider.
+      "LogLevel": {
+        "Default": "Debug", // Overrides preceding LogLevel:Default setting.
+        "Microsoft.Hosting": "Trace" // Debug:Microsoft.Hosting category.
+      }
+    },
+    "EventSource": { // EventSource provider
+      "LogLevel": {
+        "Default": "Warning" // All categories of EventSource provider.
+      }
+    }
+  },
+  "AllowedHosts": "*",
+  "PackageInfo": {
+    "email": "vincentfontaine.jobs@gmail.com",
+    "website": "https://github.com/viiinzzz/BashAPI/blob/master/README.md",
+    "license": "https://github.com/viiinzzz/BashAPI/blob/master/LICENSE",
+    "lictype": "GPLv3"
+  },
+  "bash": {
+    "command": "/bin/bash",
+    "featuredDescription": "Lilypond score conversion to pdf file",
+    "featuredTimeoutSeconds": 180,
+    "featuredCommand": "convert-ly -e \"input\" && lilypond \"input\"",
+    "featuredOutputName": "score.pdf"
+  },
+  "Kestrel": {
+    "Certificates": {
+      "Default": {
+        "Path": "/app/Viiinzzz.corp.pfx",
+        "Password": "sslpassword",
+        "AllowInvalid": true
+      }
+    }
+  }
+}

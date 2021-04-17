@@ -1,0 +1,30 @@
+﻿{
+  "Kestrel": {
+    "Limits": {
+      "MaxConcurrentConnections": 100,
+      "MaxConcurrentUpgradedConnections": 100
+    },
+    "DisableStringReuse": true
+  }
+}
+
+#https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-install-script
+
+https://docs.microsoft.com/en-us/aspnet/core/fundamentals/servers/kestrel?view=aspnetcore-3.1
+
+https://docs.microsoft.com/fr-fr/aspnet/core/fundamentals/configuration/?view=aspnetcore-5.0
+
+dotnet --info
+
+date
+
+
+
+xcopy /Y /I /E "$(TargetDir)*.*" "$(ProjectDir)bin\Docker\lydevapi"
+xcopy /Y /I /E "$(ProjectDir)wwwroot" "$(ProjectDir)bin\Docker\lydevapi\wwwroot"
+xcopy /Y "$(ProjectDir)\featured.Dockerfile\lydevapi\*.*" "$(ProjectDir)bin\Docker\lydevapi"
+
+docker build "$(ProjectDir)bin\Docker\lydevapi" --build-arg ENV="dev"
+
+
+#base64 LocalCA.pfx

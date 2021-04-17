@@ -1,0 +1,31 @@
+﻿RUN cat >LocalCA.config <<EOF
+[req]
+default_bits		= 4096
+distinguished_name	= req
+x509_extension		= v3_ca
+req_extensions		= v3_req
+
+[v3_req]
+basicConstraints	= CA:FALSE
+keyUsage			= nonRepudiation, digitalSignature, keyEncipherment
+subjectAltName		= @alt_names
+
+[alt_names]
+DNS.1				= localhost
+
+[v3_ca]
+subjectKeyIdentifier	= hash
+authorityKeyIdentifier	= keyid:always,issuer
+basicConstraints		= critical, CA:TRUE, pathlen:0
+keyUsage				= critical, cRLSign, keyCertSign
+extendedKeyUsage		= serverAuth, clientAuth
+EOF
+
+RUN openssl req -x509 -newkey rsa:4096 -sha256 -days 365 -nodes -extensions v3_ca -extensions v3_req \
+-keyout LocalCA.key -out LocalCA.crt -subj "/CN=localhost"  -config LocalCA.config \
+&& openssl x509 -noout -text -in LocalCA.crt \
+&& openssl verify -CAfile LocalCA.crt LocalCA.crt \
+&& cp LocalCA.crt /usr/local/share/ca-certificates \
+&& update-ca-certificates \
+&& openssl pkcs12 -export -out LocalCA.pfx -inkey LocalCA.key -in LocalCA.crt -passout env:SSLPW 
+#&& openssl verify LocalCA.crt \

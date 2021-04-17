@@ -1,0 +1,44 @@
+
+#docker run -it -p7580:8080 -p7581:8081     lilypond-webapi bash
+#    -e ASPNETCORE_HTTPS_PORT=5001 -e ASPNETCORE_URLS=https://+;http://+
+#    -e Kestrel__Certificates__Default__Path=/path/to/certificate.pfx
+#    -e Kestrel__Certificates__Default__Password=password
+
+FROM jeandeaual/lilypond:2.22.0
+MAINTAINER Viiinzzz <vincentfontaine.jobs@gmail.com>
+
+RUN apt update && apt -y upgrade
+RUN apt -y install curl
+
+RUN apt -y install wget build-essential libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev libffi-dev zlib1g-dev
+#RUN apt -y install libreadline-gplv2-dev 
+RUN wget https://www.python.org/ftp/python/3.9.1/Python-3.9.1.tgz
+RUN tar -xf Python-3.9.1.tgz
+RUN cd Python-3.9.1
+RUN ./configure --enable-optimizations
+RUN make -j 2
+RUN sudo make alt install
+
+#adduser bhpi
+#usermod -aG sudo bhpi
+
+COPY dotnet-install.sh /tmp/dotnet-install.sh
+RUN chmod 744 /tmp/dotnet-install.sh
+RUN /tmp/dotnet-install.sh
+ENV PATH="$PATH:/root/.dotnet"
+WORKDIR /app
+
+ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
+
+COPY . .
+RUN dotnet dev-certs https
+
+#adduser -D -u 1001 noroot
+#USER noroot
+
+ENV ASPNETCORE_URLS=http://+:8080;https://+:8081
+EXPOSE 8080
+EXPOSE 8081
+
+ENV DOTNET_CLI_TELEMETRY_OPTOUT=1
+ENTRYPOINT dotnet BashAPI.dll --urls="https://0.0.0.0:8081"

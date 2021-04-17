@@ -1,0 +1,20 @@
+{
+  "dockerImageName": "lyapi",
+  "dockerPublishHttpPort": 7580,
+  "dockerPublishSslPort": 7581,
+  "bash": {
+    "featuredDescription": "Lilypond score conversion to pdf file",
+    "featuredTimeoutSeconds": 180,
+    "featuredCommand": "convert-ly -e $input && lilypond --loglevel=DEBUG --format=pdf -dresolution=600 --output=$output $input && mv $output.pdf $output",
+    "featuredOutputName": "score.pdf"
+  },
+  "Kestrel": {
+    "Certificates": {
+      "Default": {
+        "Path": "/app/LocalCA.pfx",
+        "Password": "",
+        "AllowInvalid": true
+      }
+    }
+  }
+}

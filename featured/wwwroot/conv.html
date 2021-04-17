@@ -1,0 +1,72 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" http-equiv="refresh" />
+    <title>File Conversion .ly ➞ .pdf</title>
+    <link rel="stylesheet" href="bootstrap.min.css">
+    <link rel="stylesheet" href="default.css" />
+    <link rel="stylesheet" href="conv.css" />
+    <script src="jquery-3.4.1.min.js"></script>
+    <script src="popper.min.js"></script>
+    <script src="bootstrap.bundle.min.js"></script>
+    <script src="pdf.js"></script>
+    <script src="conv.js"></script>
+</head>
+
+<body>
+    <div id="outer">
+        <div id="top" class="m-4">
+            <h1>File Conversion .ly ➞ .pdf<span id="envir" class="anibg" style="font-size:1rem"></span></h1>
+
+            <ul class="lic">
+                <li><a href="http://github.com/viiinzzz/BashAPI/blob/master/README.md">LyAPI by Vincent Fontaine</a></li>
+            </ul>
+
+            <img style="height:100px" src="lilypond.png" alt="logo" />
+
+
+            <div class="custom-file">
+                <input type="file" id="file" name="file" class="custom-file-input" />
+                <label for="file" id="filelabel" class="custom-file-label">🙏 .ly, .zip </label>
+            </div>
+        </div>
+
+        <div id="inner">
+            <img id="spin" src="spinav.gif" />
+            <img id="failed" src="failtenor.gif" />
+            <div id="toolbar" class="btn-toolbar mb-3 px-4" role="toolbar" aria-label="toolbar">
+                <div class="btn-group mr-2" role="group" aria-label="Zoom">
+                    <button id="zoom-" type="button" class="btn btn-secondary">➖</button>
+                    <button id="zoom+" type="button" class="btn btn-secondary">➕</button>
+                    <button id="zoomDrop" type="button" class="btn btn-secondary dropdown-toggle"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                    <div class="dropdown-menu" aria-labelledby="zoomDrop">
+                        <a class="dropdown-item" id="zoomX32" href="#"></a>
+                        <a class="dropdown-item" id="zoomX42" href="#"></a>
+                        <a class="dropdown-item" id="zoomX56" href="#"></a>
+                        <a class="dropdown-item" id="zoomX75" href="#"></a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" id="zoomX100" href="#"></a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" id="zoomX133" href="#"></a>
+                        <a class="dropdown-item" id="zoomX177" href="#"></a>
+                        <a class="dropdown-item" id="zoomX236" href="#"></a>
+                        <a class="dropdown-item" id="zoomX314" href="#"></a>
+                    </div>
+                </div>
+                <div class="btn-group mr-2" role="group" aria-label="Commands">
+                    <button id="save" type="button" class="btn btn-secondary">💾</button>
+                    <button id="fullscreen" type="button" class="btn btn-secondary">⬍</button>
+                </div>
+            </div>
+
+            <div class="pages"></div>
+            <div id="doc">
+                <canvas id="pdf-layer"></canvas>
+                <div id="text-layer"></div>
+            </div>
+            <div class="pages"></div>
+        </div>
+        </div> 
+</body>
+</html>
